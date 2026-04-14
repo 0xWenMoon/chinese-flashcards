@@ -40,8 +40,12 @@ const server = http.createServer(async (req, res) => {
 
   if (!text) { res.writeHead(400); res.end('Missing ?text='); return }
 
+  // Strip punctuation Youdao can't handle
+  const clean = text.replace(/[。，、！？；：""''「」【】《》\.\,\!\?\;\:]/g, '').trim()
+  if (!clean) { res.writeHead(400); res.end('Empty text'); return }
+
   try {
-    const audio = await fetchAudio(text)
+    const audio = await fetchAudio(clean)
     res.writeHead(200, {
       'Content-Type': 'audio/mpeg',
       'Cache-Control': 'public, max-age=86400',
